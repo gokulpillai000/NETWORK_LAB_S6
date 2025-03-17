@@ -1,0 +1,99 @@
+UDP - FACTORIAL - SERVER
+
+
+#include<stdio.h>
+#include<strings.h>
+#include<unistd.h>
+#include<sys/types.h>
+#include<netinet/in.h>
+#include<netdb.h>
+int main(){
+        int serversocket,port;
+        struct sockaddr_in serveraddr,clientaddr;
+        socklen_t len;
+        int fact = 1,a,i;
+        serversocket = socket(AF_INET,SOCK_DGRAM,0);
+        bzero((char *) &serveraddr,sizeof(serveraddr));
+        serveraddr.sin_family = AF_INET;
+        printf("Enter the port number : ");
+        scanf("%d",&port);
+        serveraddr.sin_port = htons(port);
+        serveraddr.sin_addr.s_addr = INADDR_ANY;
+        bind(serversocket,(struct sockaddr*) &serveraddr,sizeof(serveraddr));
+        printf("\nWaiting for the client connection\n");
+        bzero((char *) &clientaddr,sizeof(clientaddr));
+        len = sizeof(clientaddr);
+        recvfrom(serversocket,&a,sizeof(&a),0,(struct sockaddr*) &clientaddr,&len);
+        printf("\nConnection received from client\n");
+        printf("\nThe client has send number :\t %d\n",a);
+        for(i=1;i<=a;i++){
+                fact = fact*i;
+        }
+        printf("\nSending factorial to the client\n");
+        sendto(serversocket,&fact,sizeof(&fact),0,(struct sockaddr*) &clientaddr,sizeof(clientaddr));
+        close(serversocket);
+}
+
+
+
+UDP - FACTORIAL - CLIENT
+
+
+#include<netinet/in.h>
+#include<netdb.h>
+#include<stdio.h>
+#include<strings.h>
+int main(){
+        int clientsocket,port;
+        struct sockaddr_in serveraddr;
+        socklen_t len;
+        struct hostent *server;
+        int fact,a;
+        clientsocket = socket(AF_INET,SOCK_DGRAM,0);
+        bzero((char *) &serveraddr,sizeof(serveraddr));
+        len = sizeof(serveraddr);
+        serveraddr.sin_family = AF_INET;
+        printf("Enter the port number : ");
+        scanf("%d",&port);
+        serveraddr.sin_port = htons(port);
+        fgets(&fact,2,stdin);
+        printf("\nEnter the number : \n");
+        scanf("%d",&a);
+        sendto(clientsocket,&a,sizeof(&a),0,(struct sockaddr*) &serveraddr,sizeof(serveraddr));
+        printf("\n Receiving Factorial from server\n");
+        recvfrom(clientsocket,&fact,sizeof(&fact),0,(struct sockaddr*) &serveraddr,&len);
+        printf("\n Factorial of %d is : \t%d\n",a,fact);
+        close(clientsocket);
+}
+
+
+
+
+OUTPUT - SERVER SIDE
+
+Enter the port number : 2410
+
+Waiting for the client connection
+
+Connection received from client
+
+The client has send number :	 3
+
+Sending factorial to the client
+
+
+
+OUTPUT - CLIENT SIDE
+
+
+Enter the port number : 2410
+
+Enter the number : 
+3
+
+ Receiving Factorial from server
+
+ Factorial of 3 is : 	6
+
+
+
