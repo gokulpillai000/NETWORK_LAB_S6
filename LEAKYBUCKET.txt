@@ -1,43 +1,40 @@
-LEAKYBUCKET
-
 #include<stdio.h>
-void main()
-{
-        int in,leakrate,bsize,n,bucket_storage;
-        bucket_storage=0;
-        printf("Enter the bucket size: ");
-        scanf("%d",&bsize);
-        printf("Enter the no of input: ");
-        scanf("%d",&n);
-        printf("Enter bucket outgoing rate: ");
-        scanf("%d",&leakrate);
-        printf("Intially bucket status: contian %d out of %d\n",bucket_storage,bsize);
-        while(n!=0)
-        {
-                printf("\nEnter the incoming packet size: \n");
-                scanf("%d",&in);
-                printf("Incoming packet size is %d\n",in);
-                if(in<=(bsize-bucket_storage))
-                {
-                        bucket_storage+=in;
-                        printf("Bucket status: contain %d out of %d\n",bucket_storage,bsize);
-                }
-                else
-                {
-                        printf("Dropped packets: %d\n",in-(bsize-bucket_storage));
-                        bucket_storage=bsize;
-                        printf("Bucket status:contains %d out of %d\n",bucket_storage,bsize);
-                }
-                bucket_storage=bucket_storage-leakrate;
-                if(bucket_storage>=0)
-                {
-                        printf("%d packets transmitted, bucket status: contain %d packet out of %d\n",leakrate,bucket_storage,bsize);
-                }
-                n--;
+
+void main(){
+    int n,in,bsize,leak,strg;
+    printf("no.of inputs : ");
+    scanf("%d",&n);
+    printf("bucket size : ");
+    scanf("%d",&bsize);
+    printf("outgoing rate : ");
+    scanf("%d",&leak);
+    strg = 0;
+    printf("Initial state : contains %d out of %d\n",strg,bsize);
+    while(n != 0){
+        printf("incoming packet size : ");
+        scanf("%d",&in);
+        if(in <= (bsize-strg)){
+            strg = strg + in;
+            printf("bucket status : contains %d out of %d\n",strg,bsize);
         }
-        if(n==0 && bucket_storage!=0)
-        {
-                bucket_storage=0;
-                printf("After sending,bucket contain %d packet out of %d \n",bucket_storage,bsize);
+        else{
+            printf("dropped packets : %d\n",in-(bsize-strg));
+            strg = bsize;
+            printf("bucket status : contains %d out of %d\n",strg,bsize);
         }
+        if(strg >= leak){
+            strg = strg - leak;
+            printf("packets send : %d\nbucket status : contains %d out of %d\n",leak,strg,bsize);
+        }
+        else{
+            printf("packets send : %d\nbucket status : contains 0 out of %d\n",strg,bsize);
+            strg = 0;
+        }
+        n--;
+    }
+    if(n == 0 && strg != 0){
+        printf("remaining : %d\n",strg);
+        strg = 0;
+        printf("After sending,bucket status : contains %d out of %d\n",strg,bsize);
+    }
 }
